@@ -15,5 +15,5 @@
         android:id="@+id/arFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.google.ar.sceneform.ux.ArFragment"/>
+        android:name="com.example.flutteranimatedsceneform.ArAnimatedFragment"/>
 </RelativeLayout>
