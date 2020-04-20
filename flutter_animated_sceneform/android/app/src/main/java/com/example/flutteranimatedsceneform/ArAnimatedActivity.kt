@@ -18,6 +18,8 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     private lateinit var arFragment: ArFragment
     private var modelAnimator: ModelAnimator? = null
+    private var anchor1: Anchor? = null
+    private var anchor2: Anchor? = null
 
     private var i = 0
 
@@ -27,18 +29,17 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         arFragment = supportFragmentManager.findFragmentById(R.id.arFragment) as ArFragment
         arFragment.planeDiscoveryController.hide()
+        arFragment.arSceneView.planeRenderer.isEnabled = false
         arFragment.planeDiscoveryController.setInstructionView(null)
         arFragment.arSceneView.scene.addOnUpdateListener(this)
-
-        arFragment.setOnTapArPlaneListener { hitResult, plane, motionEvent ->
-            createModel(hitResult.createAnchor(), arFragment)
-        }
     }
 
     fun setupDatabase(config: Config, session: Session) {
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.rosto)
+        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.rosto2)
         val augmentedImageDatabase = AugmentedImageDatabase(session)
         augmentedImageDatabase.addImage("rosto", bitmap, 0.700F)
+        augmentedImageDatabase.addImage("rosto2", bitmap2, 0.700F)
         config.augmentedImageDatabase = augmentedImageDatabase
     }
 
@@ -46,7 +47,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         ModelRenderable
                 .builder()
-                .setSource(this, Uri.parse("skeletal.sfb"))
+                .setSource(this, Uri.parse("book.sfb"))
                 .build()
                 .thenAccept { t: ModelRenderable ->
                     val anchorNode = AnchorNode(anchor)
@@ -68,14 +69,29 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
         }
         val animationCount = modelRenderable.animationDataCount
 
-        if(i == animationCount) {
-            i = 0
-        }
+        if(animationCount != 0) {
+            if(i == animationCount) {
+                i = 0
+            }
 
-        val animationData = modelRenderable.getAnimationData(i)
-        modelAnimator = ModelAnimator(animationData, modelRenderable)
-        modelAnimator!!.start()
-        i++
+            val animationData = modelRenderable.getAnimationData(i)
+            modelAnimator = ModelAnimator(animationData, modelRenderable)
+            modelAnimator!!.start()
+            i++
+        }
+    }
+
+    private fun placeModel(modelRenderable: ModelRenderable, anchor: Anchor) {
+        val anchorNode = AnchorNode(anchor)
+        anchorNode.renderable = modelRenderable
+        arFragment.arSceneView.scene.addChild(anchorNode)
+    }
+
+    private fun createModel2(anchor: Anchor) {
+        ModelRenderable.Builder()
+                .setSource(this, Uri.parse("fox.sfb"))
+                .build()
+                .thenAccept { t: ModelRenderable -> placeModel(t, anchor ) }
     }
 
     override fun onUpdate(p0: FrameTime?) {
@@ -84,9 +100,12 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         for(image in images) {
             if(image.trackingState == TrackingState.TRACKING) {
-                if(image.name == "rosto") {
-                    val anchor = image.createAnchor(image.centerPose)
-                    createModel(anchor, arFragment)
+                if(image.name == "rosto" && anchor1 == null) {
+                    anchor1 = image.createAnchor(image.centerPose)
+                    createModel(anchor1!!, arFragment)
+                } else if(image.name == "rosto2" && anchor2 == null) {
+                    anchor2 = image.createAnchor(image.centerPose)
+                    createModel2(anchor2!!)
                 }
             }
         }
