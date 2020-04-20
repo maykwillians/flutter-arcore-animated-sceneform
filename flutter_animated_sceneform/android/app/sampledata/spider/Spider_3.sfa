@@ -1,0 +1,247 @@
+{
+  animations: [
+    {
+      clips: [
+        {
+          name: 'Spider_Armature|Attack',
+        },
+        {
+          name: 'Spider_Armature|die',
+        },
+        {
+          name: 'Spider_Armature|die 2',
+        },
+        {
+          name: 'Spider_Armature|fall',
+        },
+        {
+          name: 'Spider_Armature|Jump',
+        },
+        {
+          name: 'Spider_Armature|normal',
+        },
+        {
+          name: 'Spider_Armature|run_ani_back',
+        },
+        {
+          name: 'Spider_Armature|run_ani_vor',
+        },
+        {
+          name: 'Spider_Armature|run_left',
+        },
+        {
+          name: 'Spider_Armature|run_right',
+        },
+        {
+          name: 'Spider_Armature|walk_ani_back',
+        },
+        {
+          name: 'Spider_Armature|walk_ani_vor',
+        },
+        {
+          name: 'Spider_Armature|walk_left',
+        },
+        {
+          name: 'Spider_Armature|walk_right',
+        },
+        {
+          name: 'Spider_Armature|warte_pose',
+        },
+      ],
+      path: 'sampledata/spider/Spider_3.fbx',
+    },
+  ],
+  materials: [
+    {
+      name: 'Spider_Eye',
+      parameters: [
+        {
+          baseColor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: 'haar_detail_NRM',
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Spider',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: 'Spinnen_Bein_tex_COLOR_',
+        },
+        {
+          normalMap: 'haar_detail_NRM',
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Spider_teeth',
+      parameters: [
+        {
+          baseColor: [
+            0.41320400000000002,
+            0.31126300000000001,
+            0.221805,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: 'haar_detail_NRM',
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Spider_Fur',
+      parameters: [
+        {
+          baseColor: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          baseColorMap: 'SH3',
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+      'BoneIndices',
+      'BoneWeights',
+    ],
+    collision: {},
+    file: 'sampledata/spider/Spider_3.fbx',
+    name: 'Spider_3',
+    recenter: 'root',
+  },
+  samplers: [
+    {
+      file: 'sampledata/spider\\textures\\haar_detail_NRM.jpg',
+      name: 'haar_detail_NRM',
+      params: {
+        usage_type: 'Normal',
+      },
+      pipeline_name: 'textures\\haar_detail_NRM.jpg',
+    },
+    {
+      file: 'sampledata/spider\\textures\\Spinnen_Bein_tex_COLOR_.jpg',
+      name: 'Spinnen_Bein_tex_COLOR_',
+      pipeline_name: 'textures\\Spinnen_Bein_tex_COLOR_',
+    },
+    {
+      file: 'sampledata/spider\\textures\\Spinnen_Bein_tex_2.jpg',
+      name: 'Spinnen_Bein_tex_2',
+      pipeline_name: 'textures\\Spinnen_Bein_tex_2.jpg',
+    },
+    {
+      file: 'sampledata/spider\\textures\\SH3.png',
+      name: 'SH3',
+      pipeline_name: 'textures\\SH3.png',
+    },
+  ],
+  version: '0.54:2',
+}

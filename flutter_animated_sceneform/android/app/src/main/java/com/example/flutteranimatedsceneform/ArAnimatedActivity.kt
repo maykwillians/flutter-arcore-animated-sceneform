@@ -35,11 +35,11 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     }
 
     fun setupDatabase(config: Config, session: Session) {
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.rosto)
-        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.rosto2)
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.teia)
+        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.campo)
         val augmentedImageDatabase = AugmentedImageDatabase(session)
-        augmentedImageDatabase.addImage("rosto", bitmap, 0.700F)
-        augmentedImageDatabase.addImage("rosto2", bitmap2, 0.700F)
+        augmentedImageDatabase.addImage("teia", bitmap, 6F)
+        augmentedImageDatabase.addImage("campo", bitmap2, 2F)
         config.augmentedImageDatabase = augmentedImageDatabase
     }
 
@@ -47,7 +47,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         ModelRenderable
                 .builder()
-                .setSource(this, Uri.parse("book.sfb"))
+                .setSource(this, Uri.parse("spider_3.sfb"))
                 .build()
                 .thenAccept { t: ModelRenderable ->
                     val anchorNode = AnchorNode(anchor)
@@ -89,7 +89,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     private fun createModel2(anchor: Anchor) {
         ModelRenderable.Builder()
-                .setSource(this, Uri.parse("fox.sfb"))
+                .setSource(this, Uri.parse("skeletal.sfb"))
                 .build()
                 .thenAccept { t: ModelRenderable -> placeModel(t, anchor ) }
     }
@@ -100,10 +100,10 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         for(image in images) {
             if(image.trackingState == TrackingState.TRACKING) {
-                if(image.name == "rosto" && anchor1 == null) {
+                if(image.name == "teia" && anchor1 == null) {
                     anchor1 = image.createAnchor(image.centerPose)
                     createModel(anchor1!!, arFragment)
-                } else if(image.name == "rosto2" && anchor2 == null) {
+                } else if(image.name == "campo" && anchor2 == null) {
                     anchor2 = image.createAnchor(image.centerPose)
                     createModel2(anchor2!!)
                 }
