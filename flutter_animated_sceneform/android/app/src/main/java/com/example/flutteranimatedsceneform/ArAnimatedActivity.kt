@@ -1,11 +1,13 @@
 package com.example.flutteranimatedsceneform
 
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RawRes
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.FrameTime
@@ -48,7 +50,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     }
 
     // Renderizando o modelo 3D na tela
-    private fun createModel(anchor: Anchor, modelPath: String, animationLoopTimer: Long) {
+    private fun createModel(anchor: Anchor, modelPath: String, animationLoopTimer: Long, @RawRes sound: Int = 0) {
         ModelRenderable
                 .builder()
                 .setSource(this, Uri.parse(modelPath))
@@ -58,11 +60,11 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
                     anchorNode.renderable = modelRenderable
                     arFragment.arSceneView.scene.addChild(anchorNode)
 
-                    animateModel(modelRenderable, animationLoopTimer)
+                    animateModel(modelRenderable, animationLoopTimer, sound)
                 }
     }
 
-    private fun animateModel(modelRenderable: ModelRenderable, animationLoopTimer: Long) {
+    private fun animateModel(modelRenderable: ModelRenderable, animationLoopTimer: Long, @RawRes sound: Int) {
 
         val mainHandler = Handler(Looper.getMainLooper())
 
@@ -72,14 +74,22 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
                 if(modelAnimator != null && modelAnimator!!.isRunning) {
                     modelAnimator!!.end()
                 }
-                
+
                 val animationData = modelRenderable.getAnimationData(0)
                 modelAnimator = ModelAnimator(animationData, modelRenderable)
                 modelAnimator!!.start()
+                playSound(sound)
 
                 mainHandler.postDelayed(this, animationLoopTimer)
             }
         })
+    }
+
+    private fun playSound(@RawRes sound: Int) {
+        if (sound != 0) {
+            val mediaPlayer = MediaPlayer.create(this, sound)
+            mediaPlayer.start()
+        }
     }
 
     override fun onUpdate(p0: FrameTime?) {
@@ -90,7 +100,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
             if(image.trackingState == TrackingState.TRACKING) {
                 if(image.name == "teia" && anchor1 == null) {
                     anchor1 = image.createAnchor(image.centerPose)
-                    createModel(anchor1!!, "spider_3.sfb", 2500L)
+                    createModel(anchor1!!, "spider_3.sfb", 2500L, R.raw.spider)
                 } else if(image.name == "campo" && anchor2 == null) {
                     anchor2 = image.createAnchor(image.centerPose)
                     createModel(anchor2!!, "skeletal.sfb", 7000L)
