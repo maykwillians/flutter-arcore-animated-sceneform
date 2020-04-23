@@ -7,14 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import androidx.annotation.RawRes
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.FrameTime
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.animation.ModelAnimator
+import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
+import kotlinx.android.synthetic.main.activity_ar_animated.*
 
 class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
@@ -22,6 +26,17 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private var modelAnimator: ModelAnimator? = null
     private var anchor1: Anchor? = null
     private var anchor2: Anchor? = null
+    private var anchorNode: AnchorNode? = null
+    private var initialVector: Vector3? = null
+    private var xInitialPos = 0F
+    private var yInitialPos = 0F
+    private var zInitialPos = 0F
+    private var updatedVector: Vector3? = null
+    private var xUpdatedPos = 0F
+    private var yUpdatedPos = 0F
+    private var zUpdatedPos = 0F
+    private lateinit var mediaPlayer: MediaPlayer
+    private var inArea = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +71,15 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
                 .setSource(this, Uri.parse(modelPath))
                 .build()
                 .thenAccept {modelRenderable: ModelRenderable ->
-                    val anchorNode = AnchorNode(anchor)
-                    anchorNode.renderable = modelRenderable
+
+                    anchorNode = AnchorNode(anchor)
+
+                    initialVector = anchorNode!!.worldPosition
+                    xInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).x
+                    yInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).y
+                    zInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).z
+
+                    anchorNode!!.renderable = modelRenderable
                     arFragment.arSceneView.scene.addChild(anchorNode)
 
                     animateModel(modelRenderable, animationLoopTimer, sound)
@@ -87,7 +109,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     private fun playSound(@RawRes sound: Int) {
         if (sound != 0) {
-            val mediaPlayer = MediaPlayer.create(this, sound)
+            mediaPlayer = MediaPlayer.create(this, sound)
             mediaPlayer.start()
         }
     }
@@ -96,14 +118,34 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
         val frame = arFragment.arSceneView.arFrame
         val images: Collection<AugmentedImage> = frame!!.getUpdatedTrackables(AugmentedImage::class.java)
 
+        if(anchorNode != null) {
+            updatedVector = anchorNode!!.worldPosition
+            xUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).x
+            yUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).y
+            zUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).z
+        }
+
+        if(xUpdatedPos >= xInitialPos + 1100F || xUpdatedPos <= xInitialPos - 1100F || yUpdatedPos >= yInitialPos + 1500F || yUpdatedPos <= yInitialPos - 1500F) {
+            if (inArea) {
+                view.visibility = VISIBLE
+                inArea = false
+            }
+        } else {
+            if (!inArea) {
+                view.visibility = GONE
+                inArea = true
+            }
+        }
+
         for(image in images) {
             if(image.trackingState == TrackingState.TRACKING) {
                 if(image.name == "teia" && anchor1 == null) {
                     anchor1 = image.createAnchor(image.centerPose)
                     createModel(anchor1!!, "spider_3.sfb", 2500L, R.raw.spider)
-                } else if(image.name == "campo" && anchor2 == null) {
+                }
+                if(image.name == "campo" && anchor2 == null) {
                     anchor2 = image.createAnchor(image.centerPose)
-                    createModel(anchor2!!, "skeletal.sfb", 7000L)
+                    createModel(anchor2!!, "skeletal.sfb", 2500L)
                 }
             }
         }
