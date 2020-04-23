@@ -30,13 +30,13 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private var initialVector: Vector3? = null
     private var xInitialPos = 0F
     private var yInitialPos = 0F
-    private var zInitialPos = 0F
     private var updatedVector: Vector3? = null
     private var xUpdatedPos = 0F
     private var yUpdatedPos = 0F
-    private var zUpdatedPos = 0F
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer: MediaPlayer? = null
     private var inArea = false
+    private var iniciou = false
+    private var mainHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,40 +77,88 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
                     initialVector = anchorNode!!.worldPosition
                     xInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).x
                     yInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).y
-                    zInitialPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(initialVector).z
 
                     anchorNode!!.renderable = modelRenderable
                     arFragment.arSceneView.scene.addChild(anchorNode)
 
-                    animateModel(modelRenderable, animationLoopTimer, sound)
+                    setupSound(sound)
+                    animateModel(modelRenderable, animationLoopTimer)
+
+                    iniciou = true
                 }
     }
 
-    private fun animateModel(modelRenderable: ModelRenderable, animationLoopTimer: Long, @RawRes sound: Int) {
+    private fun animateModel(modelRenderable: ModelRenderable, animationLoopTimer: Long) {
+        val animationData = modelRenderable.getAnimationData(0)
+        modelAnimator = ModelAnimator(animationData, modelRenderable)
+        startAnimation(animationLoopTimer)
+    }
 
-        val mainHandler = Handler(Looper.getMainLooper())
-
-        mainHandler.post(object : Runnable {
+    private fun startAnimation(animationLoopTimer: Long) {
+        mainHandler = Handler(Looper.getMainLooper())
+        mainHandler!!.post(object : Runnable {
             override fun run() {
-
-                if(modelAnimator != null && modelAnimator!!.isRunning) {
-                    modelAnimator!!.end()
+                if(!modelAnimator!!.isRunning) {
+                    modelAnimator!!.start()
                 }
-
-                val animationData = modelRenderable.getAnimationData(0)
-                modelAnimator = ModelAnimator(animationData, modelRenderable)
-                modelAnimator!!.start()
-                playSound(sound)
-
-                mainHandler.postDelayed(this, animationLoopTimer)
+                playSound()
+                mainHandler!!.postDelayed(this, animationLoopTimer)
             }
         })
     }
 
-    private fun playSound(@RawRes sound: Int) {
+    private fun stopAnimation() {
+        if(modelAnimator!!.isRunning) {
+            modelAnimator!!.end()
+        }
+        pauseSound()
+        mainHandler!!.removeMessages(0)
+    }
+
+    private fun setupSound(@RawRes sound: Int) {
         if (sound != 0) {
             mediaPlayer = MediaPlayer.create(this, sound)
-            mediaPlayer.start()
+        }
+    }
+
+    private fun playSound() {
+        mediaPlayer!!.start()
+    }
+    private fun pauseSound() {
+        mediaPlayer!!.pause()
+    }
+    private fun stopSound() {
+        mediaPlayer!!.stop()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(modelAnimator != null && modelAnimator!!.isRunning) {
+            modelAnimator!!.end()
+        }
+        if(mediaPlayer != null && mediaPlayer!!.isPlaying) {
+            stopSound()
+        }
+        if(mainHandler != null) {
+            mainHandler!!.removeMessages(0)
+        }
+    }
+
+    private fun detectLostCameraArea() {
+        if(iniciou) {
+            if(xUpdatedPos >= xInitialPos + 1100F || xUpdatedPos <= xInitialPos - 1100F || yUpdatedPos >= yInitialPos + 1500F || yUpdatedPos <= yInitialPos - 1500F) {
+                if (inArea) {
+                    view.visibility = VISIBLE
+                    stopAnimation()
+                    inArea = false
+                }
+            } else {
+                if (!inArea) {
+                    view.visibility = GONE
+                    startAnimation(2500L)
+                    inArea = true
+                }
+            }
         }
     }
 
@@ -122,20 +170,9 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
             updatedVector = anchorNode!!.worldPosition
             xUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).x
             yUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).y
-            zUpdatedPos = arFragment.arSceneView.scene.camera.worldToScreenPoint(updatedVector).z
         }
 
-        if(xUpdatedPos >= xInitialPos + 1100F || xUpdatedPos <= xInitialPos - 1100F || yUpdatedPos >= yInitialPos + 1500F || yUpdatedPos <= yInitialPos - 1500F) {
-            if (inArea) {
-                view.visibility = VISIBLE
-                inArea = false
-            }
-        } else {
-            if (!inArea) {
-                view.visibility = GONE
-                inArea = true
-            }
-        }
+        detectLostCameraArea()
 
         for(image in images) {
             if(image.trackingState == TrackingState.TRACKING) {
