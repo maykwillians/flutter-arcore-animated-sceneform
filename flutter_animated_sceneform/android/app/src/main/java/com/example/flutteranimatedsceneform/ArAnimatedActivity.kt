@@ -1,6 +1,5 @@
 package com.example.flutteranimatedsceneform
 
-import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +18,7 @@ import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import kotlinx.android.synthetic.main.activity_ar_animated.*
+import com.google.ar.core.AugmentedImageDatabase
 
 class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
@@ -37,6 +37,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private var inArea = false
     private var iniciou = false
     private var mainHandler: Handler? = null
+    private lateinit var augmentedImageDatabase: AugmentedImageDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +57,24 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     // Criando a base de dados das imagens aumentadas (bitmaps: PNG, JPG)
     fun setupDatabase(config: Config, session: Session) {
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.teia)
-        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.campo)
-        val augmentedImageDatabase = AugmentedImageDatabase(session)
-        augmentedImageDatabase.addImage("teia", bitmap, 6F)
-        augmentedImageDatabase.addImage("campo", bitmap2, 2F)
+        /*var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teia)
+        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.campo)*/
+
+        val inputStream = this.assets.open("myimages.imgdb")
+        augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, inputStream)
+
+        /*var b1: Bitmap? = null
+        var b2: Bitmap? = null
+
+        try {
+            assets.open("teia.png").use { inputStream -> b1 = BitmapFactory.decodeStream(inputStream)}
+            assets.open("campo.png").use { inputStream -> b2 = BitmapFactory.decodeStream(inputStream)}
+        } catch (e: IOException) {
+            Log.e("PRINT", "I/O exception loading augmented image bitmap.", e)
+        }
+
+        augmentedImageDatabase.addImage("teia", b1, 6F)
+        augmentedImageDatabase.addImage("campo", b2, 2F)*/
         config.augmentedImageDatabase = augmentedImageDatabase
     }
 
@@ -122,13 +136,21 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     }
 
     private fun playSound() {
-        mediaPlayer!!.start()
+        if(mediaPlayer != null) {
+            mediaPlayer!!.start()
+        }
     }
+
     private fun pauseSound() {
-        mediaPlayer!!.pause()
+        if(mediaPlayer != null) {
+            mediaPlayer!!.pause()
+        }
     }
+
     private fun stopSound() {
-        mediaPlayer!!.stop()
+        if(mediaPlayer != null) {
+            mediaPlayer!!.stop()
+        }
     }
 
     override fun onDestroy() {
@@ -176,13 +198,21 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
         for(image in images) {
             if(image.trackingState == TrackingState.TRACKING) {
-                if(image.name == "teia" && anchor1 == null) {
+                if((image.name == "1" ||
+                                image.name == "3" ||
+                                image.name == "5" ||
+                                image.name == "7" ||
+                                image.name == "9") && anchor1 == null) {
                     anchor1 = image.createAnchor(image.centerPose)
                     createModel(anchor1!!, "spider_3.sfb", 2500L, R.raw.spider)
                 }
-                if(image.name == "campo" && anchor2 == null) {
+                if((image.name == "2" ||
+                                image.name == "4" ||
+                                image.name == "6" ||
+                                image.name == "8" ||
+                                image.name == "10") && anchor2 == null) {
                     anchor2 = image.createAnchor(image.centerPose)
-                    createModel(anchor2!!, "skeletal.sfb", 2500L)
+                    createModel(anchor2!!, "skeletal.sfb", 7000L)
                 }
             }
         }

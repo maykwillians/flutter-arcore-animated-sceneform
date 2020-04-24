@@ -13,5 +13,6 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#8C000000"/>
+        android:layout_margin="8dp"
+        android:background="@drawable/focus_border"/>
 </RelativeLayout>
