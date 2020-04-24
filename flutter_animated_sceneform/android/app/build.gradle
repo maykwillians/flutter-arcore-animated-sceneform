@@ -71,6 +71,8 @@ dependencies {
     implementation 'com.google.ar.sceneform:animation:1.15.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.gms:play-services-auth:18.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 }
 
 sceneform.asset('sampledata/skeletal/58_Movement_LODa_r01.fbx',

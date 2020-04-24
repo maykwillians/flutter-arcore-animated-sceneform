@@ -57,24 +57,8 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     // Criando a base de dados das imagens aumentadas (bitmaps: PNG, JPG)
     fun setupDatabase(config: Config, session: Session) {
-        /*var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teia)
-        val bitmap2 = BitmapFactory.decodeResource(resources, R.drawable.campo)*/
-
         val inputStream = this.assets.open("myimages.imgdb")
         augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, inputStream)
-
-        /*var b1: Bitmap? = null
-        var b2: Bitmap? = null
-
-        try {
-            assets.open("teia.png").use { inputStream -> b1 = BitmapFactory.decodeStream(inputStream)}
-            assets.open("campo.png").use { inputStream -> b2 = BitmapFactory.decodeStream(inputStream)}
-        } catch (e: IOException) {
-            Log.e("PRINT", "I/O exception loading augmented image bitmap.", e)
-        }
-
-        augmentedImageDatabase.addImage("teia", b1, 6F)
-        augmentedImageDatabase.addImage("campo", b2, 2F)*/
         config.augmentedImageDatabase = augmentedImageDatabase
     }
 
