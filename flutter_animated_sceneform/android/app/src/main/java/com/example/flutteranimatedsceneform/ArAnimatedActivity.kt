@@ -89,10 +89,10 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
     private fun animateModel(modelRenderable: ModelRenderable, animationLoopTimer: Long) {
         val animationData = modelRenderable.getAnimationData(0)
         modelAnimator = ModelAnimator(animationData, modelRenderable)
-        startAnimation(animationLoopTimer)
+        resumeAnimation(animationLoopTimer)
     }
 
-    private fun startAnimation(animationLoopTimer: Long) {
+    private fun resumeAnimation(animationLoopTimer: Long) {
         mainHandler = Handler(Looper.getMainLooper())
         mainHandler!!.post(object : Runnable {
             override fun run() {
@@ -152,7 +152,8 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
 
     private fun detectLostCameraArea() {
         if(iniciou) {
-            if(xUpdatedPos >= xInitialPos + 1100F || xUpdatedPos <= xInitialPos - 1100F || yUpdatedPos >= yInitialPos + 1500F || yUpdatedPos <= yInitialPos - 1500F) {
+            // Esses valores vai depender do tamanho das imagens e do objeto 3d (posso parametrizar eles)
+            if(xUpdatedPos >= xInitialPos + 450F || xUpdatedPos <= xInitialPos - 600F || yUpdatedPos >= yInitialPos + 850F || yUpdatedPos <= yInitialPos - 600F) {
                 if (inArea) {
                     view.visibility = VISIBLE
                     stopAnimation()
@@ -161,7 +162,7 @@ class ArAnimatedActivity : AppCompatActivity(), Scene.OnUpdateListener {
             } else {
                 if (!inArea) {
                     view.visibility = GONE
-                    startAnimation(2500L)
+                    resumeAnimation(2500L)
                     inArea = true
                 }
             }
